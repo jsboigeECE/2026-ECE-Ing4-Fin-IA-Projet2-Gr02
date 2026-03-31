@@ -1,0 +1,19 @@
+{
+  "events_processed": 500,
+  "target_latency_ms": 100.0,
+  "latency_avg_ms": 26.66836999868974,
+  "latency_p95_ms": 34.83680995414032,
+  "latency_max_ms": 57.34739999752492,
+  "latency_under_target_rate": 1.0,
+  "buffer_size_final": 500,
+  "dashboard": {
+    "timestamp": "2026-03-29T20:48:36.671452+00:00",
+    "throughput_total_events": 500,
+    "fraud_flagged": 15,
+    "fraud_flagged_rate": 0.03,
+    "latency_avg_ms": 26.66836999868974,
+    "latency_max_ms": 57.34739999752492,
+    "latency_violation_rate": 0.0,
+    "current_fraud_streak": 0
+  }
+}

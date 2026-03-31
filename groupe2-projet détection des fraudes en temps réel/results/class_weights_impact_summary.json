@@ -1,0 +1,63 @@
+{
+  "class_weights": {
+    "0": 0.5008642347502763,
+    "1": 289.7732558139535
+  },
+  "thresholds": {
+    "isolation_forest_class_weights": 0.530259761045792,
+    "autoencoder_class_weights": 1.0623297714779159
+  },
+  "cost_analysis": {
+    "isolation_forest_class_weights_best_cost": 3299.0,
+    "cost_assumptions": {
+      "fp_cost": 1.0,
+      "fn_cost": 25.0
+    }
+  },
+  "results": [
+    {
+      "model": "IsolationForest",
+      "variant": "baseline",
+      "precision": 0.08430493273542601,
+      "recall": 0.6351351351351351,
+      "auprc": 0.11812312686652733,
+      "tp": 94,
+      "fp": 1021,
+      "tn": 84274,
+      "fn": 54
+    },
+    {
+      "model": "IsolationForest",
+      "variant": "class_weights",
+      "precision": 0.08970099667774087,
+      "recall": 0.18243243243243243,
+      "auprc": 0.04309946829530916,
+      "tp": 27,
+      "fp": 274,
+      "tn": 85021,
+      "fn": 121
+    },
+    {
+      "model": "Autoencoder",
+      "variant": "baseline",
+      "precision": 0.02772097250624858,
+      "recall": 0.8243243243243243,
+      "auprc": 0.07860400798781633,
+      "tp": 122,
+      "fp": 4279,
+      "tn": 81016,
+      "fn": 26
+    },
+    {
+      "model": "Autoencoder",
+      "variant": "class_weights",
+      "precision": 0.00791986955508968,
+      "recall": 0.22972972972972974,
+      "auprc": 0.005432978628775824,
+      "tp": 34,
+      "fp": 4259,
+      "tn": 81036,
+      "fn": 114
+    }
+  ]
+}

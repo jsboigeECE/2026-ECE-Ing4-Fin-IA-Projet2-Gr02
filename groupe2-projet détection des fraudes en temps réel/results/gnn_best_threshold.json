@@ -1,0 +1,19 @@
+{
+  "cost_optimal": {
+    "threshold": 0.5123115577889448,
+    "precision": 0.18564466105449712,
+    "recall": 0.8516260162601627,
+    "cost": 3663.0
+  },
+  "operational_precision_constrained": {
+    "target_precision": 0.5,
+    "threshold": 0.7181927836496534,
+    "precision": 0.5024875621890548,
+    "recall": 0.4105691056910569,
+    "cost": 7450.0,
+    "tp": 202,
+    "fp": 200,
+    "tn": 7308,
+    "fn": 290
+  }
+}

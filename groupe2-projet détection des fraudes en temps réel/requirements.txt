@@ -1,0 +1,46 @@
+# Dépendances pour C.7 - Détection de Fraude en Temps Réel
+
+# Core Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Machine Learning - Core
+scikit-learn>=1.3.0
+
+# Machine Learning - Anomaly Detection
+pyod>=1.1.0
+
+# Deep Learning - Autoencoders
+tensorflow>=2.13.0
+# ou PyTorch alternative:
+# torch>=2.0.0
+# torchvision>=0.15.0
+
+# Graph Neural Networks
+torch-geometric>=2.3.0
+
+# Class Imbalance Handling
+imbalanced-learn>=0.11.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Jupyter & Development
+jupyter>=1.0.0
+jupyterlab>=4.0.0
+ipython>=8.12.0
+
+# Additional Utilities
+scipy>=1.11.0
+joblib>=1.3.0
+tqdm>=4.65.0
+
+# Evaluation & Metrics
+scikit-metrics>=0.2.0  # AUPRC et autres métriques
+
+# Optional but Recommended
+xgboost>=2.0.0  # Pour ensemble methods
+lightgbm>=4.0.0  # Alternative gradient boosting
+optuna>=3.12.0  # Hyperparameter tuning
