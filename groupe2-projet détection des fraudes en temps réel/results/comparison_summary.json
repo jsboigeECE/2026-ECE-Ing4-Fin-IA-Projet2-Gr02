@@ -1,0 +1,20 @@
+{
+  "Isolation Forest": {
+    "precision": 0.0843,
+    "recall": 0.6351,
+    "auprc": 0.1181,
+    "tp": 94,
+    "fp": 1021,
+    "tn": 84274,
+    "fn": 54
+  },
+  "Autoencoder": {
+    "precision": 0.0277,
+    "recall": 0.8243,
+    "auprc": 0.0786,
+    "tp": 122,
+    "fp": 4279,
+    "tn": 81016,
+    "fn": 26
+  }
+}

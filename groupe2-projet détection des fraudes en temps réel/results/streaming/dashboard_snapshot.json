@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-04-09T13:38:16.696430+00:00",
+  "throughput_total_events": 1500,
+  "fraud_flagged": 40,
+  "fraud_flagged_rate": 0.02666666666666667,
+  "latency_avg_ms": 29.073140198830515,
+  "latency_max_ms": 151.58929990138859,
+  "latency_violation_rate": 0.0013333333333333333,
+  "current_fraud_streak": 0
+}
