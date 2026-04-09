@@ -396,3 +396,15 @@
 {"type": "latency_violation", "timestamp": "2026-03-29T20:45:42.277724+00:00", "event_id": 190, "latency_ms": 101.6057999804616}
 {"type": "latency_violation", "timestamp": "2026-03-29T20:45:42.687724+00:00", "event_id": 194, "latency_ms": 102.56000002846122}
 {"type": "latency_violation", "timestamp": "2026-03-29T20:45:42.799724+00:00", "event_id": 195, "latency_ms": 106.62099998444319}
+{"type": "latency_violation", "timestamp": "2026-04-07T17:28:15.074696+00:00", "event_id": 30, "latency_ms": 126.95599999278784}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:07.207693+00:00", "event_id": 0, "latency_ms": 125.86999998893589}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:08.086695+00:00", "event_id": 11, "latency_ms": 170.6211999990046}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:08.275695+00:00", "event_id": 12, "latency_ms": 184.74350008182228}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:09.373693+00:00", "event_id": 29, "latency_ms": 121.10820005182177}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:10.482696+00:00", "event_id": 44, "latency_ms": 158.66580000147223}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:10.720693+00:00", "event_id": 45, "latency_ms": 227.74849995039403}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:11.183692+00:00", "event_id": 50, "latency_ms": 115.29009998776019}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:11.533695+00:00", "event_id": 54, "latency_ms": 182.52080003730953}
+{"type": "latency_violation", "timestamp": "2026-04-07T21:51:12.309693+00:00", "event_id": 68, "latency_ms": 100.57539993431419}
+{"type": "latency_violation", "timestamp": "2026-04-09T13:38:08.166434+00:00", "event_id": 1237, "latency_ms": 151.58929990138859}
+{"type": "latency_violation", "timestamp": "2026-04-09T13:38:08.270433+00:00", "event_id": 1238, "latency_ms": 102.85749996546656}

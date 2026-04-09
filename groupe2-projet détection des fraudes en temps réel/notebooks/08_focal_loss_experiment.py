@@ -378,6 +378,22 @@ def main() -> None:
         json.dump({"gamma_tested": [gamma, gamma2], "alpha": alpha, "results": summary}, f, indent=2)
     print(f"Saved: {out_json}")
 
+    # Save raw probabilities for full ROC reconstruction in Phase 7.
+    out_scores = os.path.join(RESULTS, "focal_loss_test_scores.npz")
+    np.savez_compressed(
+        out_scores,
+        y_test=y_test.astype(np.int8),
+        bce_prob=results_bce["y_prob"].astype(np.float32),
+        wbce_prob=results_wbce["y_prob"].astype(np.float32),
+        fl2_prob=results_fl["y_prob"].astype(np.float32),
+        fl5_prob=results_fl2["y_prob"].astype(np.float32),
+        bce_threshold=np.float32(results_bce["threshold"]),
+        wbce_threshold=np.float32(results_wbce["threshold"]),
+        fl2_threshold=np.float32(results_fl["threshold"]),
+        fl5_threshold=np.float32(results_fl2["threshold"]),
+    )
+    print(f"Saved: {out_scores}")
+
     # Best model by AUPRC
     best = max(all_results, key=lambda r: r["auprc"])
     print(f"\nBest model by AUPRC: {best['model']} (AUPRC={best['auprc']:.4f})")

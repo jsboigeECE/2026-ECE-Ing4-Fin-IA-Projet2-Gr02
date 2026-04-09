@@ -16,7 +16,7 @@ print("=== PHASE 1.3: IMBALANCE ANALYSIS ===")
 print(f"Total transactions: {total_transactions:,}")
 print(f"Legitimate transactions: {legitimate_transactions:,}")
 print(f"Fraud transactions: {fraud_transactions:,}")
-print(".2f")
+print(f"Fraud ratio: {fraud_ratio:.2f}%")
 print(f"Imbalance ratio: 1:{legitimate_transactions/fraud_transactions:.0f}")
 
 # Load preprocessed data

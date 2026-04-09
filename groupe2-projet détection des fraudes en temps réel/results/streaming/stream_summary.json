@@ -1,19 +1,19 @@
 {
-  "events_processed": 500,
+  "events_processed": 1500,
   "target_latency_ms": 100.0,
-  "latency_avg_ms": 26.66836999868974,
-  "latency_p95_ms": 34.83680995414032,
-  "latency_max_ms": 57.34739999752492,
-  "latency_under_target_rate": 1.0,
+  "latency_avg_ms": 29.073140198830515,
+  "latency_p95_ms": 48.08107007993385,
+  "latency_max_ms": 151.58929990138859,
+  "latency_under_target_rate": 0.9986666666666667,
   "buffer_size_final": 500,
   "dashboard": {
-    "timestamp": "2026-03-29T20:48:36.671452+00:00",
-    "throughput_total_events": 500,
-    "fraud_flagged": 15,
-    "fraud_flagged_rate": 0.03,
-    "latency_avg_ms": 26.66836999868974,
-    "latency_max_ms": 57.34739999752492,
-    "latency_violation_rate": 0.0,
+    "timestamp": "2026-04-09T13:38:16.696430+00:00",
+    "throughput_total_events": 1500,
+    "fraud_flagged": 40,
+    "fraud_flagged_rate": 0.02666666666666667,
+    "latency_avg_ms": 29.073140198830515,
+    "latency_max_ms": 151.58929990138859,
+    "latency_violation_rate": 0.0013333333333333333,
     "current_fraud_streak": 0
   }
 }

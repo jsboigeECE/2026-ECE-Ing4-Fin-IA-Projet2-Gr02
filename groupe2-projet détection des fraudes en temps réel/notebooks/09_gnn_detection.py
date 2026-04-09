@@ -56,6 +56,7 @@ gb = importlib.util.module_from_spec(spec)
 sys.modules["graph_builder"] = gb
 spec.loader.exec_module(gb)
 build_transaction_graph = gb.build_transaction_graph
+build_hetero_transaction_graph = gb.build_hetero_transaction_graph
 graph_stats = gb.graph_stats
 save_graph = gb.save_graph
 
@@ -91,6 +92,7 @@ def train_pyg_gcn(
     epochs: int = 35,
     learning_rate: float = 5e-4,
     class_weight: dict[int, float] | None = None,
+    train_mask: torch.Tensor | None = None,
 ) -> list[float]:
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     loss_fn = nn.BCEWithLogitsLoss(reduction="none")
@@ -105,13 +107,18 @@ def train_pyg_gcn(
     else:
         sample_weight = torch.ones_like(y, dtype=torch.float32)
 
+    if train_mask is None:
+        train_mask = torch.ones_like(data.y, dtype=torch.bool)
+    else:
+        train_mask = train_mask.bool()
+
     losses: list[float] = []
     for epoch in range(1, epochs + 1):
         model.train()
         optimizer.zero_grad()
         logits, _ = model(data.x, data.edge_index)
         loss = loss_fn(logits, y)
-        loss = (loss * sample_weight).mean()
+        loss = (loss[train_mask] * sample_weight[train_mask]).mean()
         loss.backward()
         optimizer.step()
 
@@ -242,11 +249,16 @@ def main() -> None:
     # Step 5.1 — Build the transaction graph
     # -----------------------------------------------------------------------
     print("\n--- Step 5.1: Building Transaction Graph ---")
-    g = build_transaction_graph(
+    g = build_hetero_transaction_graph(
         X_all, y_all,
+        account_ids=None,
+        merchant_ids=None,
+        n_account_buckets=3000,
+        n_merchant_buckets=1500,
+        add_tx_similarity_edges=False,
         time_window=0.03,
         amount_window=0.03,
-        max_edges_per_node=8,
+        max_tx_edges_per_node=8,
         subsample=8_000,    # keep tractable for CPU training
         random_state=42,
     )
@@ -269,7 +281,9 @@ def main() -> None:
 
     input_dim = g.x.shape[1]
 
-    cw = compute_class_weight("balanced", classes=np.array([0, 1]), y=g.y)
+    tx_mask_np = g.tx_mask if g.tx_mask is not None else np.ones(g.num_nodes, dtype=bool)
+    y_train_nodes = g.y[tx_mask_np]
+    cw = compute_class_weight("balanced", classes=np.array([0, 1]), y=y_train_nodes)
     class_weight = {0: float(cw[0]), 1: float(cw[1])}
     print(f"  Class weights: {class_weight}")
 
@@ -290,26 +304,29 @@ def main() -> None:
         epochs=35,
         learning_rate=5e-4,
         class_weight=class_weight,
+        train_mask=torch.tensor(tx_mask_np, dtype=torch.bool),
     )
 
     # -----------------------------------------------------------------------
     # Step 5.3 — Evaluation
     # -----------------------------------------------------------------------
     print("\n--- Step 5.3: Evaluation ---")
-    y_prob = predict_proba_pyg(model, pyg_data).ravel()
+    y_prob_all = predict_proba_pyg(model, pyg_data).ravel()
+    y_true = g.y[tx_mask_np]
+    y_prob = y_prob_all[tx_mask_np]
 
     node_embeddings = generate_embeddings_pyg(model, pyg_data)
     emb_path = os.path.join(RESULTS, "gnn_node_embeddings.npz")
-    np.savez_compressed(emb_path, embeddings=node_embeddings, labels=g.y)
+    np.savez_compressed(emb_path, embeddings=node_embeddings, labels=g.y, tx_mask=tx_mask_np.astype(np.int8))
     print(f"  Saved: {emb_path}")
 
-    best_t, best_cost = find_best_threshold(y_prob, g.y)
+    best_t, best_cost = find_best_threshold(y_prob, y_true)
     y_pred = (y_prob >= best_t).astype(int)
 
-    auprc = float(average_precision_score(g.y, y_prob))
-    prec = float(precision_score(g.y, y_pred, zero_division=0))
-    rec = float(recall_score(g.y, y_pred, zero_division=0))
-    counts = confusion_counts(g.y, y_pred)
+    auprc = float(average_precision_score(y_true, y_prob))
+    prec = float(precision_score(y_true, y_pred, zero_division=0))
+    rec = float(recall_score(y_true, y_pred, zero_division=0))
+    counts = confusion_counts(y_true, y_pred)
     cost = compute_cost(counts)
 
     print(f"\n  GCN Results (threshold={best_t:.3f}):")
@@ -322,18 +339,18 @@ def main() -> None:
     target_precision = 0.50
     op_t, op_cost, op_precision = find_threshold_with_precision_floor(
         y_prob,
-        g.y,
+        y_true,
         min_precision=target_precision,
     )
     if np.isfinite(op_cost):
-        op_metrics = metrics_from_scores(g.y, y_prob, op_t, "GNN_operational")
+        op_metrics = metrics_from_scores(y_true, y_prob, op_t, "GNN_operational")
         print(
             f"\n  Operational threshold (precision>={target_precision:.2f}): "
             f"t={op_t:.3f}, precision={op_metrics['precision']:.4f}, "
             f"recall={op_metrics['recall']:.4f}, cost={op_metrics['cost']:.0f}€"
         )
     else:
-        op_metrics = metrics_from_scores(g.y, y_prob, best_t, "GNN_operational")
+        op_metrics = metrics_from_scores(y_true, y_prob, best_t, "GNN_operational")
         print("\n  No threshold reached the target precision; using cost-optimal threshold.")
 
     # -----------------------------------------------------------------------
@@ -343,15 +360,17 @@ def main() -> None:
     print("\n--- Step 5.3: Comparison with Forest and Autoencoder ---")
 
     # GNN metrics on graph nodes
-    gnn_metrics = metrics_from_scores(g.y, y_prob, op_metrics["threshold"], "GNN")
+    gnn_metrics = metrics_from_scores(y_true, y_prob, op_metrics["threshold"], "GNN")
+
+    x_eval = g.x[tx_mask_np]
 
     # Isolation Forest on the same nodes
     if_model = joblib.load(os.path.join(RESULTS, "isolation_forest_model.pkl"))
-    if_score = -if_model.score_samples(g.x)
+    if_score = -if_model.score_samples(x_eval)
     with open(os.path.join(RESULTS, "isolation_forest_best_threshold.json"), "r", encoding="utf-8") as f:
         if_best = json.load(f)
     if_threshold = float(if_best["best_threshold"])
-    if_metrics = metrics_from_scores(g.y, if_score, if_threshold, "IsolationForest")
+    if_metrics = metrics_from_scores(y_true, if_score, if_threshold, "IsolationForest")
 
     # Autoencoder on the same nodes (optional: TensorFlow can fail to import on some setups)
     ae_metrics = None
@@ -360,11 +379,11 @@ def main() -> None:
         from src.models.autoencoder import reconstruction_error
 
         ae_model = tf.keras.models.load_model(os.path.join(RESULTS, "autoencoder_model.keras"), compile=False)
-        ae_score = reconstruction_error(ae_model, g.x)
+        ae_score = reconstruction_error(ae_model, x_eval)
         with open(os.path.join(RESULTS, "autoencoder_detection_metrics.json"), "r", encoding="utf-8") as f:
             ae_info = json.load(f)
         ae_threshold = float(ae_info["threshold"])
-        ae_metrics = metrics_from_scores(g.y, ae_score, ae_threshold, "Autoencoder")
+        ae_metrics = metrics_from_scores(y_true, ae_score, ae_threshold, "Autoencoder")
     except Exception as exc:
         print(f"  Autoencoder comparison skipped (TensorFlow unavailable): {exc}")
 
@@ -387,11 +406,12 @@ def main() -> None:
     else:
         gnn_only_mask = (gnn_metrics["y_pred"] == 1) & (if_metrics["y_pred"] == 0)
     gnn_only_idx = np.where(gnn_only_mask)[0]
-    gnn_only_labels = g.y[gnn_only_idx]
+    gnn_only_labels = y_true[gnn_only_idx]
     gnn_only_fraud = int(gnn_only_labels.sum())
     gnn_only_total = int(len(gnn_only_idx))
 
-    in_train = int(np.sum(g.node_ids[gnn_only_idx] < n_train))
+    tx_node_ids = g.node_ids[tx_mask_np]
+    in_train = int(np.sum(tx_node_ids[gnn_only_idx] < n_train))
     in_test = gnn_only_total - in_train
 
     unique_analysis = {
@@ -401,7 +421,7 @@ def main() -> None:
         "fraud_rate_gnn_only": float(gnn_only_fraud / max(gnn_only_total, 1)),
         "from_train_split": in_train,
         "from_test_split": in_test,
-        "top_gnn_only_node_ids": g.node_ids[gnn_only_idx][:20].tolist(),
+        "top_gnn_only_node_ids": tx_node_ids[gnn_only_idx][:20].tolist(),
     }
 
     print("\n  GNN-only detections analysis:")
@@ -432,9 +452,9 @@ def main() -> None:
         f.write("threshold,precision,recall,tp,fp,tn,fn,cost\n")
         for t in th_values:
             yp = (y_prob >= t).astype(int)
-            cts = confusion_counts(g.y, yp)
-            p = precision_score(g.y, yp, zero_division=0)
-            r = recall_score(g.y, yp, zero_division=0)
+            cts = confusion_counts(y_true, yp)
+            p = precision_score(y_true, yp, zero_division=0)
+            r = recall_score(y_true, yp, zero_division=0)
             c = compute_cost(cts)
             f.write(
                 f"{float(t):.6f},{float(p):.6f},{float(r):.6f},"
@@ -482,7 +502,7 @@ def main() -> None:
     axes[0].grid(alpha=0.3)
 
     # 2 - Precision-Recall curve
-    prec_c, rec_c, _ = precision_recall_curve(g.y, y_prob)
+    prec_c, rec_c, _ = precision_recall_curve(y_true, y_prob)
     axes[1].plot(rec_c, prec_c, color="#E91E63", label=f"GCN (AUPRC={auprc:.4f})")
     axes[1].set_xlabel("Recall")
     axes[1].set_ylabel("Precision")
@@ -491,7 +511,7 @@ def main() -> None:
     axes[1].grid(alpha=0.3)
 
     # 3 - Confusion matrix
-    cm = confusion_matrix(g.y, y_pred, labels=[0, 1])
+    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
     im = axes[2].imshow(cm, cmap=plt.cm.Blues)
     fig.colorbar(im, ax=axes[2], fraction=0.046, pad=0.04)
     axes[2].set_xticks([0, 1])
@@ -514,6 +534,19 @@ def main() -> None:
     plt.close()
     print(f"\n  Saved: {out_fig}")
 
+    # Save raw probabilities on transaction nodes for full ROC in Phase 7.
+    out_scores = os.path.join(RESULTS, "gnn_test_outputs.npz")
+    np.savez_compressed(
+        out_scores,
+        y_true=y_true.astype(np.int8),
+        y_prob=y_prob.astype(np.float32),
+        y_pred_cost_opt=y_pred.astype(np.int8),
+        y_pred_operational=op_metrics["y_pred"].astype(np.int8),
+        threshold_cost_opt=np.float32(best_t),
+        threshold_operational=np.float32(op_metrics["threshold"]),
+    )
+    print(f"  Saved: {out_scores}")
+
     # -----------------------------------------------------------------------
     # Save results
     # -----------------------------------------------------------------------
@@ -522,6 +555,8 @@ def main() -> None:
         "num_nodes": g.num_nodes,
         "num_edges": g.num_edges,
         "graph_stats": stats,
+        "graph_kind": g.metadata.get("graph_kind", "unknown"),
+        "graph_metadata": g.metadata,
         "threshold": float(best_t),
         "operational_threshold": float(op_metrics["threshold"]),
         "precision": prec,

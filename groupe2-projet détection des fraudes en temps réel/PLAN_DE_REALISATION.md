@@ -145,7 +145,7 @@ Le projet a deja couvert:
 - [ ] Isolation Forest entraîné et évalué
 - [ ] Autoencoder entraîné et évalué
 - [ ] Déséquilibre géré (SMOTE + Class Weights)
-- [ ] GNN implémenté (optionnel Excellent)
+- [x] GNN implémenté (optionnel Excellent)
 - [ ] Pipeline streaming fonctionnel (optionnel Excellent)
 - [ ] Rapport final avec comparaisons
 - [ ] Toutes les visualisations générées

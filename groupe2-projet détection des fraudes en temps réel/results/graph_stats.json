@@ -1,10 +1,15 @@
 {
-  "num_nodes": 8000,
-  "num_edges": 51057,
+  "num_nodes": 8900,
+  "num_edges": 32000,
   "num_fraud": 492,
-  "fraud_rate": 0.0615,
-  "avg_degree": 10.22175,
-  "max_degree": 28,
-  "num_isolated": 646,
-  "num_components": 873
+  "fraud_rate": 0.05528089887640449,
+  "avg_degree": 3.595505617977528,
+  "max_degree": 50,
+  "num_isolated": 0,
+  "num_components": 1,
+  "num_tx_nodes": 8000,
+  "num_account_nodes": 600,
+  "num_merchant_nodes": 300,
+  "num_tx_fraud": 492,
+  "tx_fraud_rate": 0.0615
 }
