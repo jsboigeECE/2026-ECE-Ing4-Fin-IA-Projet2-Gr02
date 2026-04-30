@@ -1,0 +1,10 @@
+{
+  "num_nodes": 8000,
+  "num_edges": 51057,
+  "num_fraud": 492,
+  "fraud_rate": 0.0615,
+  "avg_degree": 10.22175,
+  "max_degree": 28,
+  "num_isolated": 646,
+  "num_components": 873
+}

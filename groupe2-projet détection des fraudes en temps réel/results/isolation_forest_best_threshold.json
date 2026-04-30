@@ -1,0 +1,14 @@
+{
+  "best_threshold": 0.5646784875427291,
+  "precision": 0.08430493273542601,
+  "recall": 0.6351351351351351,
+  "tp": 94,
+  "fp": 1021,
+  "tn": 84274,
+  "fn": 54,
+  "total_cost": 2371.0,
+  "cost_assumptions": {
+    "fp_cost": 1.0,
+    "fn_cost": 25.0
+  }
+}
