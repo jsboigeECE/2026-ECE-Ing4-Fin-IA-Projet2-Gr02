@@ -11,3 +11,11 @@ node_modules/
 package.json
 package-lock.json
 *.pth
+*.pkl
+*.npz
+*.keras
+*.zip
+*.csv
+*.npz
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/

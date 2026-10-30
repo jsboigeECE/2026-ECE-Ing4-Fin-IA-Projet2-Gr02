@@ -1,0 +1,98 @@
+[
+  {
+    "method": "Isolation Forest",
+    "precision": 0.08430493273542601,
+    "recall": 0.6351351351351351,
+    "auprc": 0.1181,
+    "cost": 2371.0,
+    "tp": 94,
+    "fp": 1021,
+    "fn": 54,
+    "latency_ms": null,
+    "note": "Seuil coût-optimal"
+  },
+  {
+    "method": "Autoencoder",
+    "precision": 0.02772097250624858,
+    "recall": 0.8243243243243243,
+    "auprc": 0.07860400798781635,
+    "cost": 4929,
+    "tp": 122,
+    "fp": 4279,
+    "fn": 26,
+    "latency_ms": null,
+    "note": "Seuil par défaut"
+  },
+  {
+    "method": "BCE baseline",
+    "precision": 0.512396694214876,
+    "recall": 0.8378378378378378,
+    "auprc": 0.7858770091757669,
+    "cost": 718.0,
+    "tp": 124,
+    "fp": 118,
+    "fn": 24,
+    "latency_ms": null,
+    "note": "Seuil coût-optimal"
+  },
+  {
+    "method": "Weighted BCE",
+    "precision": 0.6630434782608695,
+    "recall": 0.8243243243243243,
+    "auprc": 0.686596300987436,
+    "cost": 712.0,
+    "tp": 122,
+    "fp": 62,
+    "fn": 26,
+    "latency_ms": null,
+    "note": "Seuil coût-optimal"
+  },
+  {
+    "method": "Focal Loss g2.0",
+    "precision": 0.5616438356164384,
+    "recall": 0.831081081081081,
+    "auprc": 0.7434330922112797,
+    "cost": 721.0,
+    "tp": 123,
+    "fp": 96,
+    "fn": 25,
+    "latency_ms": null,
+    "note": "Seuil coût-optimal"
+  },
+  {
+    "method": "Focal Loss g5.0",
+    "precision": 0.5126050420168067,
+    "recall": 0.8243243243243243,
+    "auprc": 0.7508540510847294,
+    "cost": 766.0,
+    "tp": 122,
+    "fp": 116,
+    "fn": 26,
+    "latency_ms": null,
+    "note": "Seuil coût-optimal"
+  },
+  {
+    "method": "GCN (GNN)",
+    "precision": 0.500805152979066,
+    "recall": 0.6321138211382114,
+    "auprc": 0.617925751234571,
+    "cost": 4835.0,
+    "tp": null,
+    "fp": null,
+    "fn": null,
+    "latency_ms": null,
+    "note": "Seuil opérationnel (precision≥0.5)"
+  },
+  {
+    "method": "Streaming (IF+AE ensemble)",
+    "precision": null,
+    "recall": null,
+    "auprc": null,
+    "cost": null,
+    "tp": null,
+    "fp": null,
+    "fn": null,
+    "latency_ms": 29.1,
+    "note": "Temps réel, 500 transactions"
+  }
+]
